@@ -35,5 +35,5 @@ app.use('/api/v1', express.static(path.join(__dirname, 'public')));
 const port = process.env.PORT;
 
 app.listen(port, () => {
-    console.log(`Server is running at https://localhost:${port}`);
+    console.log(`Server is running at http://localhost:${port}`);
 })

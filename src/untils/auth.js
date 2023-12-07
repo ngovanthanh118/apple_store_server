@@ -7,7 +7,7 @@ class Authentication {
             const token = req.cookies.token;
             const _id = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
             if (_id) {
-                User.findOne({ _id: _id })
+                await User.findOne({ _id: _id })
                     .then(data => {
                         req.data = data;
                         next();

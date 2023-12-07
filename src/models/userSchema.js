@@ -15,6 +15,18 @@ const UserSchema = mongoose.Schema({
     },
     image: {
         type: String,
+        required: true,
+        default: "null",
+    },
+    phone: {
+        type: String,
+        required: true,
+        default: "null",
+    },
+    address: {
+        type: String,
+        required: true,
+        default: "null",
     },
     admin: {
         type: Boolean,

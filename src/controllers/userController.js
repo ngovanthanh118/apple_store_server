@@ -11,15 +11,13 @@ class UserController {
     async register(req, res) {
         try {
             const { name, email, password } = req.body;
-            const image = req.file?.filename;
             const hashPassword = bcrypt.hashSync(password, 10);
-            const user = await User.findOne({ email: email })
+            const user = await User.findOne({ email: email });
             if (!user) {
                 await User.create({
                     name: name,
                     email: email,
                     password: hashPassword,
-                    image: image,
                 })
                     .then((data) => res.status(200).send({ data: data, msg: 'Register successfully!' }))
                     .catch((err) => res.status(400).send({ msg: 'Register Failured!' + err }));
@@ -45,7 +43,16 @@ class UserController {
                         res.status(200).send({ token: token, data: user.name, admin: true, msg: 'Login successfully!', });
                     }
                     else {
-                        res.status(200).send({ data: token, msg: 'Login successfully!' });
+                        res.status(200).send({
+                            token: token, data:
+                            {
+                                name: user.name,
+                                email: user.email,
+                                phone: user.phone,
+                                address: user.address
+                            }
+                            , msg: 'Login successfully!'
+                        });
                     }
                 }
                 else {
@@ -63,13 +70,16 @@ class UserController {
     //Get user
     async getUser(req, res) {
         try {
-            const user = await User.find({ admin: false });
-            res.status(200).send({ data: user });
+            const page_size = 5;
+            const page = req.query.page ?? 1;
+            const skip = (page - 1) * page_size;
+            const total = await User.countDocuments({ admin: false });
+            const user = await User.find({ admin: false }).skip(skip).limit(page_size);
+            res.status(200).send({ totalDoc: total, pageSize: page_size, data: user, admin: req.data });
         } catch (error) {
             res.status(500).send({ msg: error.message });
         }
     }
-
     //Edit user
     async editUser(req, res) {
         try {
@@ -86,15 +96,23 @@ class UserController {
     async updateUser(req, res) {
         try {
             const _id = req.params.id;
-            const { name, email, password, admin } = req.body;
-            const hashPassword = bcrypt.hashSync(password, 10);
+            const { name, email, password, phone, address, admin } = req.body;
+            let hashPassword = "";
+            if (password) {
+                hashPassword = bcrypt.hashSync(password, 10);
+            }
             const user = await User.findById(_id);
             if (req.file) {
                 const image = req.file.filename;
+                if (user.image !== 'null') {
+                    fs.unlinkSync(path.join(__dirname, '../../public/images/' + user.image));
+                }
                 await User.findByIdAndUpdate(_id, {
                     name: name,
                     email: email,
-                    password: hashPassword,
+                    phone: phone,
+                    address: address,
+                    password: hashPassword || user.password,
                     image: image,
                     admin: admin
                 })
@@ -105,7 +123,9 @@ class UserController {
                 await User.findByIdAndUpdate(_id, {
                     name: name,
                     email: email,
-                    password: hashPassword,
+                    phone: phone,
+                    address: address,
+                    password: hashPassword || user.password,
                     admin: admin
                 })
                     .then(data => res.status(200).send({ data: data, msg: "Update successfully!" }))
@@ -122,7 +142,9 @@ class UserController {
             const _id = req.params.id;
             const user = await User.findById(_id);
             if (user) {
-                fs.unlinkSync(path.join(__dirname, '../../public/images/' + user.image));
+                if (user.image != "null") {
+                    fs.unlinkSync(path.join(__dirname, '../../public/images/' + user.image));
+                }
                 await User.findByIdAndDelete(_id)
                     .then(data => res.status(200).send({ msg: "Delete successfully!" }))
                     .catch(err => res.status(400).send({ msg: err }))
