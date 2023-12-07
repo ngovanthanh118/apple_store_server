@@ -1,29 +1,34 @@
 const User = require('../models/userSchema');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+const path = require('path');
+const fs = require('fs');
+const { error } = require('console');
+const { use } = require('../routes/userRouter');
 class UserController {
 
     //register
     async register(req, res) {
         try {
             const { name, email, password } = req.body;
+            const image = req.file?.filename;
             const hashPassword = bcrypt.hashSync(password, 10);
             const user = await User.findOne({ email: email })
             if (!user) {
                 await User.create({
                     name: name,
                     email: email,
-                    password: hashPassword
+                    password: hashPassword,
+                    image: image,
                 })
                     .then((data) => res.status(200).send({ data: data, msg: 'Register successfully!' }))
-                    .catch((err) => res.status(400).send({ msg: 'Register successfully!' + err }));
+                    .catch((err) => res.status(400).send({ msg: 'Register Failured!' + err }));
             }
             else {
                 res.status(400).send({ msg: 'Email is exist!' });
             }
         } catch (error) {
-            res.status(400).send({ msg: error.message });
+            res.status(500).send({ msg: error.message });
         }
     }
 
@@ -52,6 +57,78 @@ class UserController {
             }
         } catch (error) {
             res.status(400).send({ msg: error.message });
+        }
+    }
+
+    //Get user
+    async getUser(req, res) {
+        try {
+            const user = await User.find({ admin: false });
+            res.status(200).send({ data: user });
+        } catch (error) {
+            res.status(500).send({ msg: error.message });
+        }
+    }
+
+    //Edit user
+    async editUser(req, res) {
+        try {
+            const _id = req.params.id;
+            await User.findById(_id)
+                .then(data => res.status(200).send({ data: data }))
+                .catch(err => res.status(500).send({ msg: err }))
+        } catch (error) {
+            res.status(500).send({ msg: error.message });
+        }
+    }
+
+    //Update user
+    async updateUser(req, res) {
+        try {
+            const _id = req.params.id;
+            const { name, email, password, admin } = req.body;
+            const hashPassword = bcrypt.hashSync(password, 10);
+            const user = await User.findById(_id);
+            if (req.file) {
+                const image = req.file.filename;
+                await User.findByIdAndUpdate(_id, {
+                    name: name,
+                    email: email,
+                    password: hashPassword,
+                    image: image,
+                    admin: admin
+                })
+                    .then(data => res.status(200).send({ data: data, msg: "Update successfully!" }))
+                    .catch(err => res.status(400).send({ msg: err }));
+            }
+            else {
+                await User.findByIdAndUpdate(_id, {
+                    name: name,
+                    email: email,
+                    password: hashPassword,
+                    admin: admin
+                })
+                    .then(data => res.status(200).send({ data: data, msg: "Update successfully!" }))
+                    .catch(err => res.status(400).send({ msg: err }));
+            }
+
+        } catch (error) {
+            res.status(500).send({ msg: error.message });
+        }
+    }
+    //Delete user 
+    async deleteUser(req, res) {
+        try {
+            const _id = req.params.id;
+            const user = await User.findById(_id);
+            if (user) {
+                fs.unlinkSync(path.join(__dirname, '../../public/images/' + user.image));
+                await User.findByIdAndDelete(_id)
+                    .then(data => res.status(200).send({ msg: "Delete successfully!" }))
+                    .catch(err => res.status(400).send({ msg: err }))
+            }
+        } catch (error) {
+            res.status(500).send({ msg: error.message });
         }
     }
 }

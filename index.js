@@ -13,7 +13,11 @@ const app = express();
 dotenv.config();
 
 //Middlewares
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true,
+    allowedHeaders: "Content-Type",
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('combined'));

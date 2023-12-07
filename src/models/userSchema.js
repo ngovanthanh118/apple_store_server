@@ -13,6 +13,9 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    image: {
+        type: String,
+    },
     admin: {
         type: Boolean,
         default: false,
@@ -20,5 +23,7 @@ const UserSchema = mongoose.Schema({
     },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
+}, {
+    colection: 'users'
 })
 module.exports = mongoose.model('User', UserSchema);
