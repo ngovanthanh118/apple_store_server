@@ -13,14 +13,14 @@ class Authentication {
                         next();
                     })
                     .catch(err => {
-                        res.status(400).send({ msg: err, token: token })
+                        res.status(400).send({ msg: err })
                     })
             }
             else {
-                res.status(400).send("Please login!");
+                res.status(400).send({msg: "Please login!"});
             }
         } catch (error) {
-            res.status(400).send({ msg: error.message, token: req.cookies.token });
+            res.status(500).send({ msg: error.message });
         }
     }
     async checkAdmin(req, res, next) {
@@ -33,7 +33,7 @@ class Authentication {
                 res.status(400).send({ msg: "No admin!" });
             }
         } catch (error) {
-            res.status(400).send({ msg: error.message });
+            res.status(500).send({ msg: error.message });
         }
     }
 }

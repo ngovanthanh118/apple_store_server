@@ -44,6 +44,7 @@ class UserController {
                             maxAge: 24 * 60 * 60 * 1000,
                             httpOnly: true,
                             secure: true,
+                            sameSite: 'none',
                         })
                         res.status(200).send({ data: user.name, admin: true, msg: 'Login successfully!', });
                     }
@@ -52,6 +53,7 @@ class UserController {
                             maxAge: 24 * 60 * 60 * 1000,
                             httpOnly: true,
                             secure: true,
+                            sameSite: 'none',
                         })
                         res.status(200).send({ msg: 'Login successfully!' });
                     }
@@ -84,7 +86,7 @@ class UserController {
                 res.status(200).send({ data: req.data, });
             }
         } catch (error) {
-            res.status(500).send({ msg: error.message, token: res.cookies.token });
+            res.status(500).send({ msg: error.message });
         }
     }
     //Edit user
