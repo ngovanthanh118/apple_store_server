@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
         });
     },
     filename: function (req, file, cb) {
-        const fileName = file.fieldname + '_' + Date.now()+ '_' + file.originalname;
+        const fileName = file.fieldname + '_' + Date.now() + '_' + file.originalname;
         cb(null, fileName, function (err, succ) {
             if (err) {
                 console.log(err);
@@ -19,6 +19,15 @@ const storage = multer.diskStorage({
     }
 })
 
-const upload = multer({ storage: storage }).single('image');
+const upload = multer({
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only images are allowed!'), false);
+        }
+    },
+    storage: storage
+}).single('image');
 
 module.exports = upload;
