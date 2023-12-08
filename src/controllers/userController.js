@@ -40,10 +40,18 @@ class UserController {
                 if (isPassword) {
                     const token = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET);
                     if (user.admin) {
-                        res.status(200).send({ token: token, data: user.name, admin: true, msg: 'Login successfully!', });
+                        res.cookie("token", token, {
+                            maxAge: 24 * 60 * 60 * 1000,
+                            httpOnly: true
+                        })
+                        res.status(200).send({ data: user.name, admin: true, msg: 'Login successfully!', });
                     }
                     else {
-                        res.status(200).send({ token: token, msg: 'Login successfully!' });
+                        res.cookie("token", token, {
+                            maxAge: 24 * 60 * 60 * 1000,
+                            httpOnly: true
+                        })
+                        res.status(200).send({ msg: 'Login successfully!' });
                     }
                 }
                 else {
