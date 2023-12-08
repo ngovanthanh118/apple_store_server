@@ -43,16 +43,7 @@ class UserController {
                         res.status(200).send({ token: token, data: user.name, admin: true, msg: 'Login successfully!', });
                     }
                     else {
-                        res.status(200).send({
-                            token: token, data:
-                            {
-                                name: user.name,
-                                email: user.email,
-                                phone: user.phone,
-                                address: user.address
-                            }
-                            , msg: 'Login successfully!'
-                        });
+                        res.status(200).send({ token: token, msg: 'Login successfully!' });
                     }
                 }
                 else {
@@ -73,9 +64,15 @@ class UserController {
             const page_size = 5;
             const page = req.query.page ?? 1;
             const skip = (page - 1) * page_size;
+            const isAdmin = req.data.admin;
             const total = await User.countDocuments({ admin: false });
             const user = await User.find({ admin: false }).skip(skip).limit(page_size);
-            res.status(200).send({ totalDoc: total, pageSize: page_size, data: user, admin: req.data });
+            if (isAdmin) {
+                res.status(200).send({ totalDoc: total, pageSize: page_size, admin: req.data, data: user, });
+            }
+            else {
+                res.status(200).send({ data: req.data, });
+            }
         } catch (error) {
             res.status(500).send({ msg: error.message });
         }

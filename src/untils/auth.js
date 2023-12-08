@@ -26,7 +26,7 @@ class Authentication {
     async checkAdmin(req, res, next) {
         try {
             const isAdmin = req.data.admin;
-            if (isAdmin) {
+            if (isAdmin) { 
                 next();
             }
             else {

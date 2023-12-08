@@ -4,7 +4,7 @@ const UserController = require('../controllers/userController');
 const upload = require('../untils/upload');
 const Authentication = require('../untils/auth');
 //Get user
-userRouter.get('/', UserController.getUser);
+userRouter.get('/', Authentication.checkLogin, UserController.getUser);
 
 //Register
 
@@ -16,9 +16,9 @@ userRouter.post('/login', UserController.login);
 userRouter.get('/:id', Authentication.checkLogin, UserController.editUser);
 
 //Update user
-userRouter.put('/:id',Authentication.checkLogin, upload, UserController.updateUser);
+userRouter.put('/:id', Authentication.checkLogin, upload, UserController.updateUser);
 
 //Delete user
-userRouter.delete('/:id',Authentication.checkLogin, Authentication.checkAdmin, UserController.deleteUser);
+userRouter.delete('/:id', Authentication.checkLogin, Authentication.checkAdmin, UserController.deleteUser);
 
 module.exports = userRouter;
