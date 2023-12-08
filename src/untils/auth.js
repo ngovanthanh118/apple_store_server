@@ -13,20 +13,20 @@ class Authentication {
                         next();
                     })
                     .catch(err => {
-                        res.status(400).send({ msg: err })
+                        res.status(400).send({ msg: err, token: token })
                     })
             }
             else {
                 res.status(400).send("Please login!");
             }
         } catch (error) {
-            res.status(400).send({ msg: error.message });
+            res.status(400).send({ msg: error.message, token: req.cookies.token });
         }
     }
     async checkAdmin(req, res, next) {
         try {
             const isAdmin = req.data.admin;
-            if (isAdmin) { 
+            if (isAdmin) {
                 next();
             }
             else {

@@ -42,14 +42,16 @@ class UserController {
                     if (user.admin) {
                         res.cookie("token", token, {
                             maxAge: 24 * 60 * 60 * 1000,
-                            httpOnly: true
+                            httpOnly: true,
+                            secure: true,
                         })
                         res.status(200).send({ data: user.name, admin: true, msg: 'Login successfully!', });
                     }
                     else {
                         res.cookie("token", token, {
                             maxAge: 24 * 60 * 60 * 1000,
-                            httpOnly: true
+                            httpOnly: true,
+                            secure: true,
                         })
                         res.status(200).send({ msg: 'Login successfully!' });
                     }
