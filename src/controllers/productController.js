@@ -1,6 +1,7 @@
 const Product = require('../models/productSchema');
 const fs = require('fs');
 const path = require('path');
+
 class ProductController {
     //get all product
     async getProducts(req, res) {

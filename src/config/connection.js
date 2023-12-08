@@ -8,9 +8,9 @@ const connect = async () => {
         await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
             .then(() => console.log('Connect to database successfully!'))
             .catch(() => console.log('Connect to database failure!'))
+        await User;
         await Product;
         await Comment;
-        await User;
     }
     catch (err) {
         handleError(err);
