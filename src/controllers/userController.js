@@ -84,7 +84,7 @@ class UserController {
                 res.status(200).send({ data: req.data, });
             }
         } catch (error) {
-            res.status(500).send({ msg: error.message });
+            res.status(500).send({ msg: error.message, token: res.cookies.token });
         }
     }
     //Edit user
