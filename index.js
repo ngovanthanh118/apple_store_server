@@ -16,7 +16,6 @@ dotenv.config();
 app.use(cors({
     origin: true,
     credentials: true,
-    allowedHeaders: "Content-Type",
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
