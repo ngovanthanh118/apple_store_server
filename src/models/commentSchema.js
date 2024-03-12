@@ -1,24 +1,20 @@
 const mongoose = require('mongoose');
 
 const CommentSchema = mongoose.Schema({
-    title: {
-        type: String,
-        require: true,
-    },
     comment: {
         type: String,
-        require: true,
+        required: true,
     },
-    date: {
-        type: Date,
-        require: true,
-        default: Date.now,
-    },
-    product_id:{
+    user_id: {
         type: String,
-        require: true,
-    }
+        required: true,
+    },
+    product_id: {
+        type: String,
+        required: true,
+    },
 }, {
-    colection: 'comments'
+    colection: 'comments',
+    timestamps: true,
 })
 module.exports = mongoose.model('Comment', CommentSchema);

@@ -6,10 +6,14 @@ const ProductSchema = mongoose.Schema({
         required: true,
     },
     type: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+    },
+    capacity: {
         type: String,
         required: true,
     },
-    storage: {
+    size: {
         type: String,
         required: true,
     },
@@ -23,19 +27,27 @@ const ProductSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        require: true,
+        required: true,
     },
     description: {
         type: String,
         required: true,
     },
     price: {
-        type: String,
+        type: Number,
         required: true,
     },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    discount: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+    quantity: {
+        type: Number,
+        required: true,
+    },
 }, {
-    colection: 'products'
+    colection: 'products',
+    timestamps: true,
 })
 module.exports = mongoose.model('Product', ProductSchema);

@@ -1,40 +1,37 @@
 const mongoose = require('mongoose');
 
-const UserSchema = mongoose.Schema({
+const orderSchema = mongoose.Schema({
+    user_id: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+    },
     name: {
         type: String,
         required: true,
     },
-    email: {
-        type: String,
-        required: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    image: {
-        type: String,
-        required: true,
-        default: "null",
-    },
     phone: {
         type: String,
         required: true,
-        default: "null",
     },
     address: {
         type: String,
         required: true,
-        default: "null",
     },
-    admin: {
-        type: Boolean,
-        default: false,
+    note: {
+        type: String,
+        required: true,
+    },
+    details: {
+        type: Array,
+        required: true,
+    },
+    status: {
+        type: String,
+        default: "wait for confirm",
         required: true,
     },
 }, {
-    colection: 'users',
+    collection: 'orders',
     timestamps: true,
 })
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("Order", orderSchema);

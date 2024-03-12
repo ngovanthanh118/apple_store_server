@@ -43,7 +43,7 @@ class UserController {
                         res.status(200).send({ token: token, admin: true, msg: 'Login successfully!', });
                     }
                     else {
-                        res.status(200).send({ token: token, msg: 'Login successfully!' });
+                        res.status(200).send({ token: token, user_id: user._id, msg: 'Login successfully!' });
                     }
                 }
                 else {

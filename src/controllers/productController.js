@@ -4,29 +4,32 @@ const path = require('path');
 
 class ProductController {
     //get all product
-    async getProducts(req, res) {
+    async getAllProducts(req, res) {
         try {
-            if (req.query.page) {
-                const page_size = 5;
-                const page = req.query.page ?? 1;
-                const skip = (page - 1) * page_size;
-                const total = await Product.countDocuments({});
-                const products = await Product.find({}).skip(skip).limit(page_size);
-                if (products.length > 0) {
-                    res.status(200).send({ totalDoc: total, pageSize: page_size, data: products });
-                }
-                else {
-                    res.status(400).send({ msg: 'Does not exist product!' });
-                }
+            const products = await Product.find({});
+            if (products.length > 0) {
+                res.status(200).send({ data: products });
             }
             else {
-                const products = await Product.find({});
-                if (products.length > 0) {
-                    res.status(200).send({ data: products });
-                }
-                else {
-                    res.status(400).send({ msg: 'Does not exist product!' });
-                }
+                res.status(400).send({ msg: 'Does not exist product!' });
+            }
+        } catch (error) {
+            res.status(500).send({ msg: error.message });
+        }
+    }
+    //get product pagination
+    async getProducts(req, res) {
+        try {
+            const page_size = 5;
+            const page = req.query.page ?? 1;
+            const skip = (page - 1) * page_size;
+            const total = await Product.countDocuments({});
+            const products = await Product.find({}).skip(skip).limit(page_size);
+            if (products.length > 0) {
+                res.status(200).send({ totalDoc: total, pageSize: page_size, data: products });
+            }
+            else {
+                res.status(400).send({ msg: 'Does not exist product!' });
             }
         } catch (error) {
             res.status(500).send({ msg: error.message });
@@ -86,7 +89,7 @@ class ProductController {
     async updateProduct(req, res) {
         try {
             const id = req.params.id;
-            const { name, type, storage, color, description, price, status } = req.body;
+            const { name, type, capacity, color, description, price, discount, status, size, quantity } = req.body;
             if (req.file) {
                 const image = req.file.filename;
                 const product = await Product.findById(id);
@@ -94,28 +97,34 @@ class ProductController {
                 await Product.findByIdAndUpdate({ _id: id }, {
                     name: name,
                     type: type,
-                    storage: storage,
+                    capacity: capacity,
                     color: color,
                     status: status,
                     image: image,
                     description: description,
                     price: price,
+                    discount: discount,
+                    size: size,
+                    quantity: quantity,
                 })
                     .then(data => res.status(200).send({ data: data, msg: 'Update product successfully!' }))
-                    .catch(err => res.status(400).send({ msg: 'Update product failured!' }));
+                    .catch(err => res.status(400).send({ msg: 'Update product failured!', error: err }));
             }
             else {
                 await Product.findByIdAndUpdate({ _id: id }, {
                     name: name,
                     type: type,
-                    storage: storage,
+                    capacity: capacity,
                     color: color,
                     status: status,
                     description: description,
                     price: price,
+                    discount: discount,
+                    size: size,
+                    quantity: quantity,
                 })
                     .then(data => res.status(200).send({ data: data, msg: 'Update product successfully!' }))
-                    .catch(err => res.status(400).send({ msg: 'Update product failured!' }));
+                    .catch(err => res.status(400).send({ msg: 'Update product failured!', error: err }));
             }
         } catch (error) {
             res.status(400).send({ msg: error.message });

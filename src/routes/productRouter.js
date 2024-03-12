@@ -4,9 +4,10 @@ const ProductController = require('../controllers/productController');
 const upload = require('../untils/upload');
 const Authentication = require('../untils/auth');
 
-//Get all product
+//Get product pagination
 productRouter.get('/', ProductController.getProducts);
-
+//Get all product
+productRouter.get('/list', ProductController.getAllProducts);
 //create product
 productRouter.post('/', Authentication.checkLogin, Authentication.checkAdmin, upload, ProductController.createProduct);
 //get one product
