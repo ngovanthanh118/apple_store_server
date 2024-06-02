@@ -10,12 +10,14 @@ const storage = multer.diskStorage({
         });
     },
     filename: function (req, file, cb) {
-        const fileName = file.fieldname + '_' + Date.now() + '_' + file.originalname;
-        cb(null, fileName, function (err, succ) {
-            if (err) {
-                console.log(err);
-            }
-        });
+
+        //const fileName = file.fieldname + '_' + Math.floor(Math.random() * 1000000) + Date.now() + '_' + file.originalname;
+        cb(null, file.fieldname + '_' + Math.floor(Math.random() * 1000000) + Date.now() + '_' + file.originalname);
+        // cb(null, fileName, function (err, succ) {
+        //     if (err) {
+        //         console.log(err);
+        //     }
+        // });
     }
 })
 
@@ -28,6 +30,6 @@ const upload = multer({
         }
     },
     storage: storage
-}).single('image');
+})
 
 module.exports = upload;

@@ -1,37 +1,33 @@
 const mongoose = require('mongoose');
-
+const moment = require('moment-timezone');
 const ProductSchema = mongoose.Schema({
+    category_id: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+    },
     name: {
         type: String,
         required: true,
     },
-    type: {
-        type: mongoose.Types.ObjectId,
-        required: true,
-    },
     capacity: {
         type: String,
-        required: true,
+    },
+    version: {
+        type: String,
     },
     size: {
         type: String,
+    },
+    colors: {
+        type: Array,
         required: true,
     },
-    color: {
-        type: String,
-        required: true,
-    },
-    image: {
-        type: String,
-        required: true,
-    },
-    status: {
-        type: String,
+    images: {
+        type: Array,
         required: true,
     },
     description: {
         type: String,
-        required: true,
     },
     price: {
         type: Number,
@@ -39,15 +35,54 @@ const ProductSchema = mongoose.Schema({
     },
     discount: {
         type: Number,
-        required: true,
-        default: 0,
     },
     quantity: {
         type: Number,
         required: true,
     },
+    battery_life: {
+        type: Number,
+    },
+    charger_capacity: {
+        type: Number,
+    },
+    cpu: {
+        type: String,
+    },
+    gpu: {
+        type: String,
+    },
+    material: {
+        type: String,
+    },
+    ram: {
+        type: Number,
+    },
+    refresh_rate: {
+        type: Number,
+    },
+    resolution: {
+        type: String,
+    },
+    screen_size: {
+        type: Number,
+    },
+    screen_type: {
+        type: String,
+    },
+    operating_system: {
+        type: String,
+    },
+    createdAt: {
+        type: Date,
+        default: moment().tz("Asia/Ho_Chi_Minh").format()
+    },
+    updatedAt: {
+        type: Date,
+        default: moment().tz("Asia/Ho_Chi_Minh").format()
+    }
 }, {
     colection: 'products',
-    timestamps: true,
+    timestamp: true
 })
 module.exports = mongoose.model('Product', ProductSchema);

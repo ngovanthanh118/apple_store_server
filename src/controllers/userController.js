@@ -10,29 +10,39 @@ class UserController {
     //register
     async register(req, res) {
         try {
-            const { name, email, password } = req.body;
+            const { name, email, phone, password } = req.body;
             const hashPassword = bcrypt.hashSync(password, 10);
             const user = await User.findOne({ email: email });
             if (!user) {
                 await User.create({
                     name: name,
                     email: email,
+                    phone: phone,
                     password: hashPassword,
                 })
-                    .then((data) => res.status(200).send({ data: data, msg: 'Register successfully!' }))
-                    .catch((err) => res.status(400).send({ msg: 'Register Failured!' + err }));
+                    .then((data) => {
+                        const token = jwt.sign({ _id: data._id }, process.env.ACCESS_TOKEN_SECRET);
+                        res.status(200).send({
+                            error: false,
+                            token: token,
+                            data: data,
+                            msg: 'Đăng ký thành công'
+                        })
+                    })
+                    .catch((err) => res.status(400).send({ error: true, msg: err }));
             }
             else {
-                res.status(400).send({ msg: 'Email is exist!' });
+                res.status(400).send({ error: true, msg: 'Tài khoản đã tồn tại' });
             }
         } catch (error) {
-            res.status(500).send({ msg: error.message });
+            res.status(500).send({ error: true, msg: error.message });
         }
     }
 
     //login
     async login(req, res) {
         try {
+
             const { email, password } = req.body;
             const user = await User.findOne({ email: email });
             if (user) {
@@ -40,21 +50,26 @@ class UserController {
                 if (isPassword) {
                     const token = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET);
                     if (user.admin) {
-                        res.status(200).send({ token: token, admin: true, msg: 'Login successfully!', });
+                        res.status(200).send({ error: false, token: token, admin: true, msg: 'Đăng nhập thành công', });
                     }
                     else {
-                        res.status(200).send({ token: token, user_id: user._id, msg: 'Login successfully!' });
+                        res.status(200).send({
+                            error: false,
+                            token: token,
+                            data: user,
+                            msg: 'Đăng nhập thành công'
+                        });
                     }
                 }
                 else {
-                    res.status(400).send({ msg: 'Password incorrect!' });
+                    res.status(200).send({ error: true, msg: 'Mật khẩu không chính xác' });
                 }
             }
             else {
-                res.status(400).send({ msg: 'Email does not exist!' });
+                res.status(400).send({ error: true, msg: 'Tài khoản không tồn tại' });
             }
         } catch (error) {
-            res.status(400).send({ msg: error.message });
+            res.status(500).send({ error: true, msg: error.message });
         }
     }
 
@@ -93,44 +108,76 @@ class UserController {
     async updateUser(req, res) {
         try {
             const _id = req.params.id;
-            const { name, email, password, phone, address, admin } = req.body;
-            let hashPassword = "";
-            if (password) {
-                hashPassword = bcrypt.hashSync(password, 10);
-            }
+            const { name, password, phone, address } = req.body;
             const user = await User.findById(_id);
-            if (req.file) {
-                const image = req.file.filename;
-                if (user.image !== 'null') {
-                    fs.unlinkSync(path.join(__dirname, '../../public/images/' + user.image));
+            if (password) {
+                const hashPassword = bcrypt.hashSync(password, 10);
+                if (req.file) {
+                    const image = req.file.filename;
+                    if (user.image !== 'null') {
+                        fs.unlinkSync(path.join(__dirname, '../../public/images/' + user.image));
+                    }
+                    await User.findByIdAndUpdate(_id, {
+                        name: name,
+                        phone: phone,
+                        address: address,
+                        password: hashPassword,
+                        image: image,
+                    })
+                        .then(data => res.status(200).send({ data: data, msg: "Update successfully!" }))
+                        .catch(err => res.status(400).send({ msg: err }));
                 }
-                await User.findByIdAndUpdate(_id, {
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    address: address,
-                    password: hashPassword || user.password,
-                    image: image,
-                    admin: admin
-                })
-                    .then(data => res.status(200).send({ data: data, msg: "Update successfully!" }))
-                    .catch(err => res.status(400).send({ msg: err }));
+                else {
+                    await User.findByIdAndUpdate(_id, {
+                        name: name,
+                        phone: phone,
+                        address: address,
+                        password: hashPassword,
+                    })
+                        .then(data => res.status(200).send({ data: data, msg: "Update successfully!" }))
+                        .catch(err => res.status(400).send({ msg: err }));
+                }
+            } else {
+                if (req.file) {
+                    const image = req.file.filename;
+                    if (user.image !== 'null') {
+                        fs.unlinkSync(path.join(__dirname, '../../public/images/' + user.image));
+                    }
+                    await User.findByIdAndUpdate(_id, {
+                        name: name,
+                        phone: phone,
+                        address: address,
+                        image: image,
+                    })
+                        .then(data => res.status(200).send({ data: data, msg: "Update successfully!" }))
+                        .catch(err => res.status(400).send({ msg: err }));
+                }
+                else {
+                    await User.findByIdAndUpdate(_id, {
+                        name: name,
+                        phone: phone,
+                        address: address,
+                    })
+                        .then(data => res.status(200).send({ data: data, msg: "Update successfully!" }))
+                        .catch(err => res.status(400).send({ msg: err }));
+                }
             }
-            else {
-                await User.findByIdAndUpdate(_id, {
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    address: address,
-                    password: hashPassword || user.password,
-                    admin: admin
-                })
-                    .then(data => res.status(200).send({ data: data, msg: "Update successfully!" }))
-                    .catch(err => res.status(400).send({ msg: err }));
-            }
+
+
 
         } catch (error) {
             res.status(500).send({ msg: error.message });
+        }
+    }
+    //asign admin 
+    async asignPermissionAdmin(req, res) {
+        const id = req.params.id;
+        try {
+            await User.findByIdAndUpdate(id, { admin: true })
+                .then(() => res.status(200).send({ error: false, msg: "Phân quyền admin thành công" }))
+                .catch(err => res.status(400).send({ error: true, msg: err.message }))
+        } catch (error) {
+            res.status(500).send({ error: true, msg: error.message })
         }
     }
     //Delete user 

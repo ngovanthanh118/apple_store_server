@@ -17,7 +17,7 @@ class Authentication {
                     })
             }
             else {
-                res.status(400).send({msg: "Please login!"});
+                res.status(400).send({ msg: "Please login!" });
             }
         } catch (error) {
             res.status(500).send({ msg: error.message });
@@ -35,6 +35,24 @@ class Authentication {
         } catch (error) {
             res.status(500).send({ msg: error.message });
         }
+    }
+    async verifyToken(req, res, next) {
+        const token = req.headers.token;
+        if (token) {
+            const _id = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+            const user = await User.findById(_id);
+            if (user) {
+                res.status(200).send({
+                    error: false,
+                    token: token,
+                    data: user,
+                    msg: 'Đăng nhập thành công'
+                });
+                return;
+            }
+            next();
+        }
+        next();
     }
 }
 

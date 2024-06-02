@@ -10,14 +10,15 @@ userRouter.get('/', Authentication.checkLogin, UserController.getUser);
 
 userRouter.post('/register', UserController.register);
 //Login
-userRouter.post('/login', UserController.login);
+userRouter.post('/login', Authentication.verifyToken, UserController.login);
 
 //Edit user
 userRouter.get('/:id', Authentication.checkLogin, UserController.editUser);
 
 //Update user
-userRouter.put('/:id', Authentication.checkLogin, upload, UserController.updateUser);
-
+userRouter.put('/:id', upload.single('image'), UserController.updateUser);
+//Asign permission admin
+userRouter.put('/:id/permission', Authentication.checkLogin, Authentication.checkAdmin, UserController.asignPermissionAdmin);
 //Delete user
 userRouter.delete('/:id', Authentication.checkLogin, Authentication.checkAdmin, UserController.deleteUser);
 
