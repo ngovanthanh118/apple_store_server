@@ -20,7 +20,6 @@ const orderSchema = mongoose.Schema(
     },
     note: {
       type: String,
-      required: true,
     },
     payment_method: {
       type: String,
@@ -39,6 +38,10 @@ const orderSchema = mongoose.Schema(
         color: {
           type: String,
           required: true
+        },
+        price: {
+          type: Number,
+          required: true,
         },
         quantity: {
           type: Number,

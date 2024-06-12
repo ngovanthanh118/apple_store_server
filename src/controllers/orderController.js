@@ -68,12 +68,11 @@ class OrderController {
                         ...product._doc,
                         name: productInfo?.name,
                         image: productInfo?.images[0],
-                        price: productInfo?.price,
                         capacity: productInfo?.capacity,
                     };
                 })
             )
-            const totalPay = productResponse.reduce((preValue, currentValue) => preValue + (currentValue.quantity * currentValue.price), 0);
+            const totalPay = order.products.reduce((preValue, currentValue) => preValue + (currentValue.quantity * currentValue.price), 0);
             res.status(200).send({
                 error: false, data: {
                     ...order._doc,
@@ -117,9 +116,15 @@ class OrderController {
     async updateStatusOrder(req, res) {
         const id = req.params.id;
         try {
-            await Order.findByIdAndUpdate(id, { status: req.body.status })
-                .then(data => res.status(200).send({ error: false, msg: 'update status successfully!' }))
-                .catch(err => res.status(400).send({ error: true, msg: 'update status failured!' }));
+            const orderInfo = await Order.findByIdAndUpdate(id, { status: req.body.status })
+            if (req.body.status === "Đã hủy") {
+                orderInfo.products.forEach(async (product) => {
+                    const productById = await Product.findById(product.product_id);
+                    const increaseQuantity = productById.quantity + product.quantity;
+                    await Product.findByIdAndUpdate({ _id: product.product_id }, { quantity: increaseQuantity });
+                })
+            }
+            res.status(200).send({ error: false, msg: "Cập nhật trạng thái thành công" })
         } catch (error) {
             res.status(500).send({ error: true, msg: error.message });
         }

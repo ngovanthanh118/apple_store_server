@@ -7,7 +7,7 @@ class ProductController {
     //get all product
     async getAllProducts(req, res) {
         try {
-            const products = await Product.find({});
+            const products = await Product.find({ status: true });
             if (products.length > 0) {
                 res.status(200).send({ data: products });
             }

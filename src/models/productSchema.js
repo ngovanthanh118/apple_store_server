@@ -73,6 +73,11 @@ const ProductSchema = mongoose.Schema({
     operating_system: {
         type: String,
     },
+    status: {
+        type: Boolean,
+        required: true,
+        default: true,
+    },
     createdAt: {
         type: Date,
         default: moment().tz("Asia/Ho_Chi_Minh").format()
